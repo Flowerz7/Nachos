@@ -106,6 +106,24 @@ int System2User(int virtAddr, int len, char* buffer) {
 }
 
 
+// Using this instead Halt() funtion:
+void IncreasePC()
+{
+    // Get the current PC value:
+    int PCRegValue = machine->ReadRegister(PCReg);
+
+    // Change the Previous PC value to current PC value:
+    machine->WriteRegister(PrevPCReg, PCRegValue);
+
+    // Get the next PC value:
+    int NextPCRegValue = machine->ReadRegister(NextPCReg);
+
+    // Change the current PC Reg value to next PC value:
+    machine->WriteRegister(PCReg, NextPCRegValue);
+
+    // Inscrease the next PC Reg value 4 bytes:
+    machine->WriteRegister(NextPCReg, NextPCRegValue + 4);
+}
 
 
 void ExceptionHandler(ExceptionType which)
@@ -192,7 +210,30 @@ void ExceptionHandler(ExceptionType which)
             int op2 = machine->ReadRegister(5);
             int result = op1 - op2;
             machine->WriteRegister(2, result);
-            interrupt->Halt();
+            IncreasePC();
+            break;
+          }
+          case SC_ReadString: {
+            // Get argument of this syscall from Registers.
+            int virtAddr, length;
+            // Get buffer (char[]) argument from Register 4.
+            virtAddr = machine->ReadRegister(4);
+            // Get max length (int) argumrnt from Register 5.
+            length = machine->ReadRegister(5);
+
+            // Create a system buffer in kernal mode.
+            char* systemBuffer;
+            systemBuffer = User2System(virtAddr, length);
+
+            // Reading String into system buffer:
+            gSynchConsole->Read(systemBuffer, length);
+
+            // copy the system buffer to the user buffer of user mode:
+            System2User(virtAddr, length, systemBuffer);
+
+            delete systemBuffer;
+            IncreasePC();
+            break;
           }
           default: {
             printf("\n Unexpected user mode exception (%d %d)", which, type);
@@ -201,43 +242,43 @@ void ExceptionHandler(ExceptionType which)
        }
       case PageFaultException: {
         DEBUG('a', "\n This is PageFaultException.");
-        printf("This is PageFaultException.");
+        printf("\n\n This is PageFaultException.");
         interrupt->Halt();
         break;
       }
       case ReadOnlyException: {
         DEBUG('a', "\n This is ReadOnlyException.");
-        printf("This is ReadOnlyException.");
+        printf("\n\n This is ReadOnlyException.");
         interrupt->Halt();
         break;
       }
       case BusErrorException: {
         DEBUG('a', "\n This is BusErrorException.");
-        printf("This is BusErrorException.");
+        printf("\n\n This is BusErrorException.");
         interrupt->Halt();
         break;
       }
       case AddressErrorException: {
         DEBUG('a', "\n This is AddressErrorException.");
-        printf("This is AddressErrorException.");
+        printf("\n\n This is AddressErrorException.");
         interrupt->Halt();
         break;
       }
       case OverflowException: {
         DEBUG('a', "\n This is OverflowException.");
-        printf("This is OverflowException.");
+        printf("\n\n This is OverflowException.");
         interrupt->Halt();
         break;
       }
       case IllegalInstrException: {
         DEBUG('a', "\n This is IllegalInstrException.");
-        printf("This is IllegalInstrException.");
+        printf("\n\n This is IllegalInstrException.");
         interrupt->Halt();
         break;
       }
       case NumExceptionTypes: {
         DEBUG('a', "\n This is NumExceptionTypes.");
-        printf("This is NumExceptionTypes.");
+        printf("\n\n This is NumExceptionTypes.");
         interrupt->Halt();
         break;
       }

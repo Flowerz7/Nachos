@@ -31,6 +31,8 @@
 #define SC_Yield	10
 #define SC_Sub 43
 
+#define SC_ReadString 11
+
 
 
 #ifndef IN_ASM
@@ -128,6 +130,12 @@ void Fork(void (*func)());
 void Yield();		
 
 int Sub(int a, int b);
+
+// Syscall ReadString
+// Input: - char[] buffer: the given buffer.
+//        - int length: maxLength can be read in given buffer.
+// Purpose: Reading the input string of user in terminal.
+void ReadString(char buffer[], int length);
 
 #endif /* IN_ASM */
 
