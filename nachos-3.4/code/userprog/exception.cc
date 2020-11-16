@@ -213,6 +213,56 @@ void ExceptionHandler(ExceptionType which)
             IncreasePC();
             break;
           }
+	  case  SC_ReadInt:{
+	  //doc mot so int va tra ve.
+            DEBUG('a', "Read integer number from console.\n");
+            int number = 0; // luu ket qua tra ve
+	    int nDigit = 0;
+	    int i;
+            int MAX_INT_LENGTH= 255
+	    char* bufer = new char[MAX_INT_LENGTH+1];
+	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer vaf tra ve ki tu doc duoc
+	    i = bufer[0] == '-' ? 1:0 ;
+	    //chuyen chuoi ve so nguyen
+	    for (; i < nDigit; ++i) 
+	    {
+		number = number*10 + (int) (bufer[i] - 48);
+	    }
+	    number = bufer[0] == '-' ? -1*number : number;
+	    machine->WriteRegister(2, number);
+	    delete bufer;
+	    return
+	  }  break;
+	  case SC_PrintInt:{
+	    char s[255], neg, tmp;
+	    neg = '-';
+	    int i, n, mid, sz;
+	    i = n = 0;
+	    DEBUG('a', "Read argument value at r4");
+	    n = machine->ReadRegister(4);
+	    //chuyen so am thanh so duong
+	    if (n < 0)
+		{
+			gSynchConsole->Write(&neg,1);
+			n = -n;
+		}
+	    do {
+			s[i++] = n%10 + '0';
+		} while (( n /= 10) > 0);
+	    sz = i;
+            s[sz] = '\n';
+	    mid = i / 2;
+	   // o tren do..while: ki tu cuoi luu o dau 
+	   // duoi day while: dao nguoc lai
+	    while (i-->mid)
+	      {
+		tmp = s[sz-i-1];
+		s[sz-i-1] = s[i];
+		s[i] = tmp;
+	      }
+	   gSynchConsole->Write(s, sz);
+	   }
+	     break;
           case SC_ReadString: {
             // Get argument of this syscall from Registers.
             int virtAddr, length;
