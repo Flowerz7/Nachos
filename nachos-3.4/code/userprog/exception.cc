@@ -272,28 +272,45 @@ void ExceptionHandler(ExceptionType which)
 	   gSynchConsole->Write(s, sz);
 	   }
 	     break;
-          case SC_ReadString: {
-            // Get argument of this syscall from Registers.
-            int virtAddr, length;
-            // Get buffer (char[]) argument from Register 4.
-            virtAddr = machine->ReadRegister(4);
-            // Get max length (int) argumrnt from Register 5.
-            length = machine->ReadRegister(5);
+      case SC_ReadString: {
+        // Get argument of this syscall from Registers.
+        int virtAddr, length;
+        // Get buffer (char[]) argument from Register 4.
+        virtAddr = machine->ReadRegister(4);
+        // Get max length (int) argumrnt from Register 5.
+        length = machine->ReadRegister(5);
 
-            // Create a system buffer in kernal mode.
-            char* systemBuffer;
-            systemBuffer = User2System(virtAddr, length);
+        // Create a system buffer in kernal mode.
+        char* systemBuffer;
+        systemBuffer = User2System(virtAddr, length);
 
-            // Reading String into system buffer:
-            gSynchConsole->Read(systemBuffer, length);
+        // Reading String into system buffer:
+        gSynchConsole->Read(systemBuffer, length);
 
-            // copy the system buffer to the user buffer of user mode:
-            System2User(virtAddr, length, systemBuffer);
+        // copy the system buffer to the user buffer of user mode:
+        System2User(virtAddr, length, systemBuffer);
 
-            delete systemBuffer;
-            IncreasePC();
-            break;
-          }
+        delete systemBuffer;
+        IncreasePC();
+        break;
+      }
+      case SC_PrintString:
+      {
+          // Input: Buffer(char*)
+          // Output: Chuoi doc duoc tu buffer(char*)
+          // Cong dung: Xuat mot chuoi la tham so buffer truyen vao ra man hinh
+          int virtAddr;
+          char* buffer;
+          virtAddr = machine->ReadRegister(4); // Lay dia chi cua tham so buffer tu thanh ghi so 4
+          buffer = User2System(virtAddr, 255); // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai 255 ki tu
+          int length = 0;
+          while (buffer[length] != 0) length++; // Dem do dai that cua chuoi
+          gSynchConsole->Write(buffer, length + 1); // Goi ham Write cua SynchConsole de in chuoi
+          delete buffer;
+          //IncreasePC(); // Tang Program Counter 
+          //return;
+          break;
+      }
 	  case SC_ReadChar:
 	  {
 	  	DEBUG('a', "Read Char Syscall ...\n");
@@ -329,7 +346,7 @@ void ExceptionHandler(ExceptionType which)
 		gSynchConsole->Write(&printChar, 1);				
 		break;	
 	  }
-      case SC_Help:
+      /*case SC_Help:
       {
           DEBUG('a', "Help Syscall\n");
           IncreasePC();
@@ -338,15 +355,16 @@ void ExceptionHandler(ExceptionType which)
       case SC_Sort:
       {
           DEBUG('a', "Sort array Syscall\n");
+          Sort();
           IncreasePC();
           break;
       }
-      case SC_Help:
+      case SC_Ascii:
       {
           DEBUG('a', "Help Syscall\n");
           IncreasePC();
           break;
-      }
+      }*/
           default: {
             printf("\n Unexpected user mode exception (%d %d)", which, type);
             interrupt->Halt();
@@ -394,5 +412,11 @@ void ExceptionHandler(ExceptionType which)
         interrupt->Halt();
         break;
       }
+      /*case InvalidDataException: {
+         DEBUG('a', "\n This is InvalidDataException.");
+         printf("\n\n This is InvalidDataException.");
+         interrupt->Halt();
+         break;
+      }*/
     }
 }
