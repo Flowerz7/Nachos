@@ -10,30 +10,61 @@
 #include "syscall.h"
 #include "copyright.h"
 
-int A[1024];	/* size of physical memory; with code, we'll run out of space!*/
+int A[100];	/* maximum size available*/
 
 int
 main()
 {
-    int i, j, tmp, n;
-    PrintString("Nhap so n (n <= 100):");
-    n = ReadInt();
+    int i, j, tmp, n, asc;
+    do
+    {
+        PrintString("Nhap so n (0 < n <= 100):");
+        n = ReadInt();
+        if (n > 100 || n < 0)
+        {
+            PrintString("Invalid data\n");
+        }
+    } while (n > 100 || n < 0);
+    
 
-
-    /* first initialize the array, in reverse sorted order */
+    /*initialize the array*/
     for (i = 0; i < n; i++)
     {
-        PrintString("Nhap so cac phan tu mang:");
+        PrintString("Nhap cac phan tu mang:");
         A[i] = ReadInt();
     }
 
-    /* then sort! */
-    for (i = 0; i < n-1; i++)
-        for (j = i; j < (n - 1 - i); j++)
-	   if (A[j] > A[j + 1]) {	/* out of order -> need to swap ! */
-	      tmp = A[j];
-	      A[j] = A[j + 1];
-	      A[j + 1] = tmp;
-    	   }
+    PrintString("Nhap thu tu sap xep (tang dan: 1, giam dan: 0):");
+    asc = ReadInt();
+
+    /*sort */
+    if (asc == 1) {
+
+        for (i = 0; i < n - 1; i++)
+        {
+            for (j = i; j < (n - 1 - i); j++)
+            {
+                if (A[j] > A[j + 1]) {	/* out of order -> need to swap ! */
+                    tmp = A[j];
+                    A[j] = A[j + 1];
+                    A[j + 1] = tmp;
+                }
+            }
+        }
+    }
+    else if (asc == 0) {
+        for (i = 0; i < n - 1; i++)
+        {
+            for (j = i; j < (n - 1 - i); j++)
+            {
+                if (A[j] < A[j + 1]) {	/* out of order -> need to swap ! */
+                    tmp = A[j];
+                    A[j] = A[j + 1];
+                    A[j + 1] = tmp;
+                }
+            }
+        }
+    }
+    else PrintString("Invalid data\n");
     Exit(A[0]);		/* and then we're done -- should be 0! */
 }

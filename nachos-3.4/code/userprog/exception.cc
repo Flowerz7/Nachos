@@ -214,6 +214,7 @@ void ExceptionHandler(ExceptionType which)
             IncreasePC();
             break;
           }
+
 	  case  SC_ReadInt:{
 	  //doc mot so int va tra ve.
             DEBUG('a', "Read integer number from console.\n");
@@ -224,6 +225,16 @@ void ExceptionHandler(ExceptionType which)
 	    char* bufer = new char[MAX_INT_LENGTH+1];
 	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer va tra ve ki tu doc duoc
 	    i = bufer[0] == '-' ? 1:0 ;
+	    for (; i < nDigit; ++i) 
+	    {
+		int j=i+1;
+		if(bufer[i]== '.' && buffer[j] != '0' )
+		{
+			delete buffer;
+                        return 0;
+		}
+			
+	    }
 	    //chuyen chuoi ve so nguyen
 	    for (; i < nDigit; ++i) 
 	    {
@@ -233,6 +244,7 @@ void ExceptionHandler(ExceptionType which)
 	    machine->WriteRegister(2, number);
 	    delete bufer;
 	  }  
+
 	  case SC_PrintInt:{
 	    char s[255], neg, tmp;
 	    neg = '-';
@@ -318,8 +330,6 @@ void ExceptionHandler(ExceptionType which)
           }
 
 
-
-
 	  case SC_ReadChar:
 	  {
 	  	DEBUG('a', "Read Char Syscall ...\n");
@@ -355,18 +365,6 @@ void ExceptionHandler(ExceptionType which)
 		gSynchConsole->Write(&printChar, 1);				
 		break;	
 	  }
-      case SC_Help:
-      {
-          DEBUG('a', "Help Syscall\n");
-          IncreasePC();
-          break;
-      }
-      case SC_Sort:
-      {
-          DEBUG('a', "Sort array Syscall\n");
-          IncreasePC();
-          break;
-      }
           default: {
             printf("\n Unexpected user mode exception (%d %d)", which, type);
             interrupt->Halt();
@@ -374,6 +372,7 @@ void ExceptionHandler(ExceptionType which)
        }
        break;
       }
+
       case PageFaultException: {
         DEBUG('a', "\n This is PageFaultException.");
         printf("\n\n This is PageFaultException.");
@@ -416,5 +415,11 @@ void ExceptionHandler(ExceptionType which)
         interrupt->Halt();
         break;
       }
+      /*case InvalidDataException: {
+         DEBUG('a', "\n This is InvalidDataException.");
+         printf("\n\n This is InvalidDataException.");
+         interrupt->Halt();
+         break;
+      }*/
     }
 }
