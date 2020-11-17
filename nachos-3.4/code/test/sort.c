@@ -65,6 +65,15 @@ main()
             }
         }
     }
-    else PrintString("Invalid data\n");
+    else
+    {
+        PrintString("Invalid data\n");
+        Halt();
+    }
+    PrintString("Mang da sap xep: ");
+    for (i = 0; i < n; i++)
+    {
+        PrintInt(A[i]);
+    }
     Exit(A[0]);		/* and then we're done -- should be 0! */
 }

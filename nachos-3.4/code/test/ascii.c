@@ -5,18 +5,17 @@
 #include "copyright.h"
 
 
-int octCode = 32;
-int i = octCode;
-
 int
 main()
 {
+    int octCode = 32;
+    int i = octCode;
     for (i; i < 128; i++) {
         /*printf("\n%5d%5c", octCode, octCode);*/
         PrintInt(octCode);
-	    PrintChar(' ');
+	    PrintString(' ');
         PrintChar(octCode);
-        PrintChar('\n');
+        PrintString('\n');
         
     }
 
