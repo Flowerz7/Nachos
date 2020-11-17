@@ -223,6 +223,16 @@ void ExceptionHandler(ExceptionType which)
 	    char* bufer = new char[MAX_INT_LENGTH+1];
 	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer va tra ve ki tu doc duoc
 	    i = bufer[0] == '-' ? 1:0 ;
+	    for (; i < nDigit; ++i) 
+	    {
+		int j=i+1;
+		if(bufer[i]== '.' && buffer[j] != '0' )
+		{
+			delete buffer;
+                        return 0;
+		}
+			
+	    }
 	    //chuyen chuoi ve so nguyen
 	    for (; i < nDigit; ++i) 
 	    {
