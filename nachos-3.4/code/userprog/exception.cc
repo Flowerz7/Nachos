@@ -231,7 +231,6 @@ void ExceptionHandler(ExceptionType which)
 	    number = bufer[0] == '-' ? -1*number : number;
 	    machine->WriteRegister(2, number);
 	    delete bufer;
-	    return
 	  }  break;
 	  case SC_PrintInt:{
 	    char s[255], neg, tmp;
