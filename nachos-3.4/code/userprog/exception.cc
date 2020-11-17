@@ -314,7 +314,7 @@ void ExceptionHandler(ExceptionType which)
             char* kernalBuffer;
             kernalBuffer = User2System(virtAddr, MaxStringLength);
 
-            // Call the real length of the given String: 
+            // Calc the real length of the given String: 
             int length = 0;
             while (kernalBuffer[length] != 0) {
               length++;
