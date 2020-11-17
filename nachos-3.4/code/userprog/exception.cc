@@ -219,7 +219,7 @@ void ExceptionHandler(ExceptionType which)
             int number = 0; // luu ket qua tra ve
 	    int nDigit = 0;
 	    int i;
-            int MAX_INT_LENGTH= 255
+            int MAX_INT_LENGTH= 255;
 	    char* bufer = new char[MAX_INT_LENGTH+1];
 	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer va tra ve ki tu doc duoc
 	    i = bufer[0] == '-' ? 1:0 ;
@@ -231,8 +231,7 @@ void ExceptionHandler(ExceptionType which)
 	    number = bufer[0] == '-' ? -1*number : number;
 	    machine->WriteRegister(2, number);
 	    delete bufer;
-	    return
-	  }  break;
+	  }  
 	  case SC_PrintInt:{
 	    char s[255], neg, tmp;
 	    neg = '-';
@@ -329,12 +328,6 @@ void ExceptionHandler(ExceptionType which)
       case SC_Sort:
       {
           DEBUG('a', "Sort array Syscall\n");
-          IncreasePC();
-          break;
-      }
-      case SC_Help:
-      {
-          DEBUG('a', "Help Syscall\n");
           IncreasePC();
           break;
       }
