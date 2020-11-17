@@ -4,11 +4,14 @@
 #include "syscall.h"
 #include "copyright.h"
 
+
+int octCode = 32;
+int i = octCode;
+
 int
 main()
 {
-    int octCode = 32;
-    for (int i = octCode; i < 128; i++) {
+    for (i; i < 128; i++) {
         /*printf("\n%5d%5c", octCode, octCode);*/
         PrintInt(octCode);
 	    PrintChar(' ');
