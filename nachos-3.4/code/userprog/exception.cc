@@ -309,7 +309,7 @@ void ExceptionHandler(ExceptionType which)
             int virtAddr;
             virtAddr = machine->ReadRegister(4);
 
-            // Create buffer in Kernal mode by clonning the given String in
+            // Create buffer in Kernel mode by clonning the given String in
             // usermode: 
             char* kernalBuffer;
             kernalBuffer = User2System(virtAddr, MaxStringLength);
