@@ -221,7 +221,7 @@ void ExceptionHandler(ExceptionType which)
 	    int i;
             int MAX_INT_LENGTH= 255
 	    char* bufer = new char[MAX_INT_LENGTH+1];
-	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer vaf tra ve ki tu doc duoc
+	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer va tra ve ki tu doc duoc
 	    i = bufer[0] == '-' ? 1:0 ;
 	    //chuyen chuoi ve so nguyen
 	    for (; i < nDigit; ++i) 
@@ -319,7 +319,25 @@ void ExceptionHandler(ExceptionType which)
 		printChar = (char)machine->ReadRegister(4);
 		gSynchConsole->Write(&printChar, 1);				
 		break;	
-	  }		
+	  }
+      case SC_Help:
+      {
+          DEBUG('a', "Help Syscall\n");
+          IncreasePC();
+          break;
+      }
+      case SC_Sort:
+      {
+          DEBUG('a', "Sort array Syscall\n");
+          IncreasePC();
+          break;
+      }
+      case SC_Help:
+      {
+          DEBUG('a', "Help Syscall\n");
+          IncreasePC();
+          break;
+      }
           default: {
             printf("\n Unexpected user mode exception (%d %d)", which, type);
             interrupt->Halt();

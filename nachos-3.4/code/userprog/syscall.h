@@ -36,6 +36,9 @@
 #define SC_PrintChar	14
 #define SC_ReadInt 15
 #define SC_PrintInt 16
+#define SC_Sort 17
+#define SC_Ascii 18
+#define SC_Help 19
 
 #ifndef IN_ASM
 
@@ -144,6 +147,10 @@ char ReadChar();
 void PrintChar(char character);
 int ReadInt();
 void PrintInt(int number);
+void Sort();
+void Ascii();
+void Help();
+
 #endif /* IN_ASM */
 
 #endif /* SYSCALL_H */

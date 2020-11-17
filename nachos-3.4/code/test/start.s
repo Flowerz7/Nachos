@@ -160,6 +160,12 @@ PrintChar:
 	j	$31
 	.end PrintChar
 
+Help:
+	addiu $2,$0,SC_Help
+	syscall
+	j	$31
+	.end Help
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main
