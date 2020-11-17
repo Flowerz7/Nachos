@@ -17,5 +17,6 @@ main()
     PrintString("* -Chuong trinh sort cho phep nguoi dung nhap mang n so nguyen *\n");
     PrintString("*(n<100), nguoi dung chon mot trong hai cach sap xep tang dan  *\n");
     PrintString("*(chon lenh 1) va giam dan (chon lenh 2)                       *\n");
+    Halt();
     return 0;
 }

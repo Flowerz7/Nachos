@@ -25,6 +25,7 @@
 #include "system.h"
 #include "syscall.h"
 #define MaxFileLength 32
+#define MaxStringLength 255
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -134,7 +135,7 @@ void ExceptionHandler(ExceptionType which)
       case NoException:
         return;
 
-      case SyscallException:
+      case SyscallException: {
         switch (type) {
           case SC_Halt: {
             DEBUG('a', "\n Shutdown, initiated by user program.");
@@ -262,28 +263,63 @@ void ExceptionHandler(ExceptionType which)
 	   gSynchConsole->Write(s, sz);
 	   }
 	     break;
+
+
+          // ReadString Syscall:
           case SC_ReadString: {
-            // Get argument of this syscall from Registers.
             int virtAddr, length;
-            // Get buffer (char[]) argument from Register 4.
+
+            // Get buffer (char[]) argument from Register 4:
             virtAddr = machine->ReadRegister(4);
-            // Get max length (int) argumrnt from Register 5.
+
+            // Get max length (int) argumrnt from Register 5:
             length = machine->ReadRegister(5);
 
-            // Create a system buffer in kernal mode.
+            // Create a system buffer in kernal mode with the same max length:
             char* systemBuffer;
             systemBuffer = User2System(virtAddr, length);
 
-            // Reading String into system buffer:
+            // Reading give String from console and store it into systemBuffer:
             gSynchConsole->Read(systemBuffer, length);
 
             // copy the system buffer to the user buffer of user mode:
             System2User(virtAddr, length, systemBuffer);
-
             delete systemBuffer;
+
+            // Increase PC:
             IncreasePC();
             break;
           }
+
+          // Print String Syscall:
+          case SC_PrintString: {
+            // Get the buffer address store the string that need to be print:
+            int virtAddr;
+            virtAddr = machine->ReadRegister(4);
+
+            // Create buffer in Kernal mode by clonning the given String in
+            // usermode: 
+            char* kernalBuffer;
+            kernalBuffer = User2System(virtAddr, MaxStringLength);
+
+            // Call the real length of the given String: 
+            int length = 0;
+            while (kernalBuffer[length] != 0) {
+              length++;
+            }
+
+            // Print the given String to screen by using SynchConsole class:
+            gSynchConsole->Write(kernalBuffer, length + 1);
+            delete kernalBuffer;
+
+            // Increase PC:
+            IncreasePC();
+            break;
+          }
+
+
+
+
 	  case SC_ReadChar:
 	  {
 	  	DEBUG('a', "Read Char Syscall ...\n");
@@ -336,6 +372,8 @@ void ExceptionHandler(ExceptionType which)
             interrupt->Halt();
           }
        }
+       break;
+      }
       case PageFaultException: {
         DEBUG('a', "\n This is PageFaultException.");
         printf("\n\n This is PageFaultException.");

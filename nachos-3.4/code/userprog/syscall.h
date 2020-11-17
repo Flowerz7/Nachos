@@ -32,6 +32,7 @@
 #define SC_Sub 43
 
 #define SC_ReadString 11
+#define SC_PrintString 12
 #define SC_ReadChar	13
 #define SC_PrintChar	14
 #define SC_ReadInt 15
@@ -136,13 +137,23 @@ void Yield();
 
 int Sub(int a, int b);
 
+
 // Syscall ReadString
 // Input: - char[] buffer: the given buffer.
 //        - int length: maxLength can be read in given buffer.
 // Purpose: Reading the input string of user in terminal.
 void ReadString(char buffer[], int length);
+
+// Syscall PrintString
+// Input: - char[] buffer: The given buffer that store the String.
+// Purpose: Print the given string to screen.
+void PrintString(char buffer[]);
+
+
 // Read a character from input
 char ReadChar();
+
+
 // Print a character
 void PrintChar(char character);
 int ReadInt();
