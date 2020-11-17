@@ -227,11 +227,18 @@ void ExceptionHandler(ExceptionType which)
 	    i = bufer[0] == '-' ? 1:0 ;
 	    for (; i < nDigit; ++i) 
 	    {
-		int j=i+1;
-		if(bufer[i]== '.' && buffer[j] != '0' )
+		if(bufer[i]== '.' )
 		{
-			delete buffer;
-                        return 0;
+			int j=i+1;
+			for( ; j < nDigit; j++)
+			{
+				if(bufer[j] != '0')
+				{ 
+				        machine->WriteRegister(2, 0);
+					delete buffer;
+                                        return ;
+				}
+			}
 		}
 			
 	    }
