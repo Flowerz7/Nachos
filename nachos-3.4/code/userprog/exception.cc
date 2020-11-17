@@ -296,9 +296,6 @@ void ExceptionHandler(ExceptionType which)
       }
       case SC_PrintString:
       {
-          // Input: Buffer(char*)
-          // Output: Chuoi doc duoc tu buffer(char*)
-          // Cong dung: Xuat mot chuoi la tham so buffer truyen vao ra man hinh
           int virtAddr;
           char* buffer;
           virtAddr = machine->ReadRegister(4); // Lay dia chi cua tham so buffer tu thanh ghi so 4
@@ -307,8 +304,7 @@ void ExceptionHandler(ExceptionType which)
           while (buffer[length] != 0) length++; // Dem do dai that cua chuoi
           gSynchConsole->Write(buffer, length + 1); // Goi ham Write cua SynchConsole de in chuoi
           delete buffer;
-          //IncreasePC(); // Tang Program Counter 
-          //return;
+          IncreasePC(); // Tang Program Counter 
           break;
       }
 	  case SC_ReadChar:
