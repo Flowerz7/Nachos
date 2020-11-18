@@ -235,7 +235,7 @@ void ExceptionHandler(ExceptionType which)
 				if(bufer[j] != '0')
 				{ 
 				        machine->WriteRegister(2, 0);
-					delete buffer;
+					//delete buffer;
                                         return ;
 				}
 			}
@@ -249,7 +249,10 @@ void ExceptionHandler(ExceptionType which)
 	    }
 	    number = bufer[0] == '-' ? -1*number : number;
 	    machine->WriteRegister(2, number);
-	    delete bufer;
+	    //delete bufer;
+
+      IncreasePC();
+      break;
 	  }  
 
 	  case SC_PrintInt:{
@@ -280,8 +283,11 @@ void ExceptionHandler(ExceptionType which)
 		s[i] = tmp;
 	      }
 	   gSynchConsole->Write(s, sz);
-	   }
+
+
+       IncreasePC();
 	     break;
+	   }
 
 
           // ReadString Syscall:

@@ -170,6 +170,22 @@ PrintChar:
 	j	$31
 	.end PrintChar
 
+	.globl PrintInt
+	.ent	PrintInt
+PrintInt:
+	addiu $2,$0,SC_PrintInt
+	syscall
+	j	$31
+	.end PrintInt
+
+	.globl ReadInt
+	.ent	ReadInt
+ReadInt:
+	addiu $2,$0,SC_ReadInt
+	syscall
+	j	$31
+	.end ReadInt
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main
