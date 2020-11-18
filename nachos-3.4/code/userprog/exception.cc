@@ -215,45 +215,88 @@ void ExceptionHandler(ExceptionType which)
             break;
           }
 
-	  case  SC_ReadInt:{
-	  //doc mot so int va tra ve.
-            DEBUG('a', "Read integer number from console.\n");
-            int number = 0; // luu ket qua tra ve
-	    int nDigit = 0;
-	    int i;
-            int MAX_INT_LENGTH= 255;
-	    char* bufer = new char[MAX_INT_LENGTH+1];
-	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer va tra ve ki tu doc duoc
-	    i = bufer[0] == '-' ? 1:0 ;
-	    for (; i < nDigit; ++i) 
-	    {
-		if(bufer[i]== '.' )
-		{
-			int j=i+1;
-			for( ; j < nDigit; j++)
-			{
-				if(bufer[j] != '0')
-				{ 
-				        machine->WriteRegister(2, 0);
-					//delete buffer;
-                                        return ;
-				}
-			}
-		}
-			
-	    }
-	    //chuyen chuoi ve so nguyen
-	    for (; i < nDigit; ++i) 
-	    {
-		number = number*10 + (int) (bufer[i] - 48);
-	    }
-	    number = bufer[0] == '-' ? -1*number : number;
-	    machine->WriteRegister(2, number);
-	    //delete bufer;
+          case SC_ReadInt: {
+            char* buffer;
+            int MaxBufferSize = 255;
+            buffer = new char[MaxBufferSize + 1];
 
-      IncreasePC();
-      break;
-	  }  
+            // Reading number from console and store it into buffer:
+            // Store the number of byte into numBytes:
+            int numOfByte = gSynchConsole->Read(buffer, MaxBufferSize);
+
+            // firtNumIndex will store the first char of the valid substring
+            // that can be converted to integer:
+            int firstNumIndex = 0;
+            
+            // lastNumIndex will store the last char of the valid substring
+            // that can be converted to integer:
+            int lastNumIndex = 0;
+
+            // Check the given number is positive or negative:
+            bool isNegative = false; 
+            if(buffer[0] == '-')
+            {
+              isNegative = true;
+              firstNumIndex = 1;
+              lastNumIndex = 1;
+            }
+
+            // Find the max length substring from the given string that can be
+            // convert to integer:
+            for(int i = firstNumIndex; i < numOfByte; i++)
+            {
+              // Check Case 1: If have . in String => All digit after . is 0:
+              if(buffer[i] == '.') 
+              {
+                int j = i + 1;
+                for(; j < numOfByte; j++)
+                {
+                  if(buffer[j] != '0')
+                  {
+                    printf("\n\n The integer number is not valid");
+                    DEBUG('a', "\n The integer number is not valid");
+                    machine->WriteRegister(2, 0);
+                    IncreasePC();
+                    delete buffer;
+                    return;
+                  }
+                }
+
+                lastNumIndex = i - 1;
+                break;
+              }
+              // Check Case 2: all digit is betwenn 0 and 9:
+              else if(buffer[i] < '0' && buffer[i] > '9')
+              {
+                printf("\n\n The integer number is not valid");
+                DEBUG('a', "\n The integer number is not valid");
+                machine->WriteRegister(2, 0);
+                IncreasePC();
+                delete buffer;
+                return;
+              }
+              lastNumIndex = i;
+            }
+            
+
+            // Convert the valid subString to Integer number:
+            int number = 0; 
+            for(int i = firstNumIndex; i<= lastNumIndex; i++)
+            {
+              number = number * 10 + (int)(buffer[i] - 48);
+            }
+
+            // Case the integer is negative:
+            if(isNegative)
+            {
+              number = number * -1;
+            }
+            machine->WriteRegister(2, number);
+            IncreasePC();
+            delete buffer;
+            return;
+          }
+
 
 	  case SC_PrintInt:{
 	    char s[255], neg, tmp;
