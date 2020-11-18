@@ -8,14 +8,13 @@
 int
 main()
 {
-    int octCode = 32;
-    int i = octCode;
+    int decCode = 32;
+    int i = decCode;
     char asciiChar;
     for (i; i < 128; i++) {
-	asciiChar = '0' + i - '0'; //chuyen kieu int sang char
-        /*printf("\n%5d%5c", octCode, octCode);*/
+	    asciiChar = '0' + i - '0'; //chuyen kieu int sang char
         PrintInt(i);
-	PrintChar(' ');
+	    PrintChar(' ');
         PrintChar(asciiChar);
         PrintChar('\n');
     }
