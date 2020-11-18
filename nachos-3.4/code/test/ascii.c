@@ -9,11 +9,10 @@ int
 main()
 {
     int decCode = 32;
-    int i = decCode;
     char asciiChar;
-    for (i; i < 128; i++) {
-	    asciiChar = '0' + i - '0'; //chuyen kieu int sang char
-        PrintInt(i);
+    for (decCode; decCode < 128; decCode++) {
+	    asciiChar = '0' + decCode - '0'; //chuyen kieu int sang char
+        PrintInt(decCode);
 	    PrintChar(' ');
         PrintChar(asciiChar);
         PrintChar('\n');
