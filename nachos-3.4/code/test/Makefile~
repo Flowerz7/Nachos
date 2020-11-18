@@ -98,6 +98,6 @@ checkReadChar: checkReadChar.o start.o
 
 sort.o: sort.c
 	$(CC) $(CFLAGS) -c sort.c
-sub: sort.o start.o
+sort: sort.o start.o
 	$(LD) $(LDFLAGS) start.o sort.o -o sort.coff
 	../bin/coff2noff sort.coff sort
