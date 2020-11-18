@@ -375,7 +375,8 @@ void ExceptionHandler(ExceptionType which)
 		DEBUG('a', "Print Char Syscall\n");	
 		char printChar;
 		printChar = (char)machine->ReadRegister(4);
-		gSynchConsole->Write(&printChar, 1);				
+		gSynchConsole->Write(&printChar, 1);
+		IncreasePC();				
 		break;	
 	  }
           default: {

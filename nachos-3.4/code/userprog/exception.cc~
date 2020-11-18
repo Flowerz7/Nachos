@@ -25,6 +25,7 @@
 #include "system.h"
 #include "syscall.h"
 #define MaxFileLength 32
+#define MaxStringLength 255
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -134,7 +135,7 @@ void ExceptionHandler(ExceptionType which)
       case NoException:
         return;
 
-      case SyscallException:
+      case SyscallException: {
         switch (type) {
           case SC_Halt: {
             DEBUG('a', "\n Shutdown, initiated by user program.");
@@ -213,28 +214,135 @@ void ExceptionHandler(ExceptionType which)
             IncreasePC();
             break;
           }
+
+	  case  SC_ReadInt:{
+	  //doc mot so int va tra ve.
+            DEBUG('a', "Read integer number from console.\n");
+            int number = 0; // luu ket qua tra ve
+	    int nDigit = 0;
+	    int i;
+            int MAX_INT_LENGTH= 255;
+	    char* bufer = new char[MAX_INT_LENGTH+1];
+	    nDigit = gSynchConsole->Read(bufer, MAX_INT_LENGTH);// doc buffer va tra ve ki tu doc duoc
+	    i = bufer[0] == '-' ? 1:0 ;
+	    for (; i < nDigit; ++i) 
+	    {
+		if(bufer[i]== '.' )
+		{
+			int j=i+1;
+			for( ; j < nDigit; j++)
+			{
+				if(bufer[j] != '0')
+				{ 
+				        machine->WriteRegister(2, 0);
+					//delete buffer;
+                                        return ;
+				}
+			}
+		}
+			
+	    }
+	    //chuyen chuoi ve so nguyen
+	    for (; i < nDigit; ++i) 
+	    {
+		number = number*10 + (int) (bufer[i] - 48);
+	    }
+	    number = bufer[0] == '-' ? -1*number : number;
+	    machine->WriteRegister(2, number);
+	    //delete bufer;
+
+      IncreasePC();
+      break;
+	  }  
+
+	  case SC_PrintInt:{
+	    char s[255], neg, tmp;
+	    neg = '-';
+	    int i, n, mid, sz;
+	    i = n = 0;
+	    DEBUG('a', "Read argument value at r4");
+	    n = machine->ReadRegister(4);
+	    //chuyen so am thanh so duong
+	    if (n < 0)
+		{
+			gSynchConsole->Write(&neg,1);
+			n = -n;
+		}
+	    do {
+			s[i++] = n%10 + '0';
+		} while (( n /= 10) > 0);
+	    sz = i;
+            s[sz] = '\n';
+	    mid = i / 2;
+	   // o tren do..while: ki tu cuoi luu o dau 
+	   // duoi day while: dao nguoc lai
+	    while (i-->mid)
+	      {
+		tmp = s[sz-i-1];
+		s[sz-i-1] = s[i];
+		s[i] = tmp;
+	      }
+	   gSynchConsole->Write(s, sz);
+
+
+       IncreasePC();
+	     break;
+	   }
+
+
+          // ReadString Syscall:
           case SC_ReadString: {
-            // Get argument of this syscall from Registers.
             int virtAddr, length;
-            // Get buffer (char[]) argument from Register 4.
+
+            // Get buffer (char[]) argument from Register 4:
             virtAddr = machine->ReadRegister(4);
-            // Get max length (int) argumrnt from Register 5.
+
+            // Get max length (int) argumrnt from Register 5:
             length = machine->ReadRegister(5);
 
-            // Create a system buffer in kernal mode.
+            // Create a system buffer in kernal mode with the same max length:
             char* systemBuffer;
             systemBuffer = User2System(virtAddr, length);
 
-            // Reading String into system buffer:
+            // Reading give String from console and store it into systemBuffer:
             gSynchConsole->Read(systemBuffer, length);
 
             // copy the system buffer to the user buffer of user mode:
             System2User(virtAddr, length, systemBuffer);
-
             delete systemBuffer;
+
+            // Increase PC:
             IncreasePC();
             break;
           }
+
+          // Print String Syscall:
+          case SC_PrintString: {
+            // Get the buffer address store the string that need to be print:
+            int virtAddr;
+            virtAddr = machine->ReadRegister(4);
+
+            // Create buffer in Kernel mode by clonning the given String in
+            // usermode: 
+            char* kernalBuffer;
+            kernalBuffer = User2System(virtAddr, MaxStringLength);
+
+            // Calc the real length of the given String: 
+            int length = 0;
+            while (kernalBuffer[length] != 0) {
+              length++;
+            }
+
+            // Print the given String to screen by using SynchConsole class:
+            gSynchConsole->Write(kernalBuffer, length + 1);
+            delete kernalBuffer;
+
+            // Increase PC:
+            IncreasePC();
+            break;
+          }
+
+
 	  case SC_ReadChar:
 	  {
 	  	DEBUG('a', "Read Char Syscall ...\n");
@@ -259,6 +367,7 @@ void ExceptionHandler(ExceptionType which)
 				machine->WriteRegister(2, readChar);
 			}
 		delete buff;
+		IncreasePC();
 		break;
 	  }
 	  case SC_PrintChar:
@@ -266,14 +375,18 @@ void ExceptionHandler(ExceptionType which)
 		DEBUG('a', "Print Char Syscall\n");	
 		char printChar;
 		printChar = (char)machine->ReadRegister(4);
-		gSynchConsole->Write(&printChar, 1);				
+		gSynchConsole->Write(&printChar, 1);
+		IncreasePC();				
 		break;	
-	  }		
+	  }
           default: {
             printf("\n Unexpected user mode exception (%d %d)", which, type);
             interrupt->Halt();
           }
        }
+       break;
+      }
+
       case PageFaultException: {
         DEBUG('a', "\n This is PageFaultException.");
         printf("\n\n This is PageFaultException.");
@@ -316,6 +429,11 @@ void ExceptionHandler(ExceptionType which)
         interrupt->Halt();
         break;
       }
+      /*case InvalidDataException: {
+         DEBUG('a', "\n This is InvalidDataException.");
+         printf("\n\n This is InvalidDataException.");
+         interrupt->Halt();
+         break;
+      }*/
     }
-    IncreasePC();
 }
