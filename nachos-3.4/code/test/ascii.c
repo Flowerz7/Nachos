@@ -19,4 +19,5 @@ main()
     }
 
     return 0;
+    Halt();
 }

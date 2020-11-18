@@ -389,21 +389,21 @@ void ExceptionHandler(ExceptionType which)
 	  case SC_ReadChar:
 	  {
 	  	DEBUG('a', "Read Char Syscall ...\n");
-		char *buff = new char[2]; 
+		char *buff = new char[2]; //tao mang de doc chuoi nhap tu phim
 		int numbOfChar = gSynchConsole->Read(buff, 2);
-		if (numbOfChar == 0)
+		if (numbOfChar == 0)//khong co ky tu nao duoc nhap.	
 		{
 			DEBUG('a', "Empty character.\n");
-			machine->WriteRegister(2, 0);						
+			machine->WriteRegister(2, 0);					
 		}
 		else
-			if (numbOfChar == 1)
+			if (numbOfChar == 1)//co 1 ky tu
 			{						
 				DEBUG('a', "Reading Character ...\n");
-				char readChar = buff[0];
+				char readChar = buff[0];//luu gia tri vao bien tra ve user mode
 				machine->WriteRegister(2, readChar);						
 			}
-			else
+			else//neu co 2 ky tu tro len thi chi tra ve ky tu dau tien doc duoc
 			{
 				DEBUG('a', "Only the first character will be read.\n");
 				char readChar = buff[0];
@@ -417,7 +417,7 @@ void ExceptionHandler(ExceptionType which)
 	  {
 		DEBUG('a', "Print Char Syscall\n");	
 		char printChar;
-		printChar = (char)machine->ReadRegister(4);
+		printChar = (char)machine->ReadRegister(4);//lay gia tri doc duoc tu tham so.
 		gSynchConsole->Write(&printChar, 1);
 		IncreasePC();				
 		break;	
