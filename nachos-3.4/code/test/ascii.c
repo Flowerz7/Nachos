@@ -18,6 +18,6 @@ main()
         PrintChar('\n');
     }
 
-    return 0;
     Halt();
+    return 0;
 }

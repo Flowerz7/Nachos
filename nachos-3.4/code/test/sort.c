@@ -74,6 +74,7 @@ main()
     for (i = 0; i < n; i++)
     {
         PrintInt(A[i]);
+        PrintChar(' ');
     }
     Exit(A[0]);		/* and then we're done -- should be 0! */
 }
