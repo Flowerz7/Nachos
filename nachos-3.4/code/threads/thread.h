@@ -87,8 +87,22 @@ class Thread {
 					// must not be running when delete 
 					// is called
 
-    // basic thread operations
 
+
+    // ID of the Thread:
+    int processID;
+    int exitStatus;
+
+    // Dealocate space:
+    void FreeSpace(){
+      if (space != 0){
+        delete space;
+      }
+    }
+
+
+
+    // basic thread operations
     void Fork(VoidFunctionPtr func, int arg); 	// Make thread run (*func)(arg)
     void Yield();  				// Relinquish the CPU if any 
 						// other thread is runnable
