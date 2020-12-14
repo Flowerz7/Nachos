@@ -27,20 +27,19 @@ PTable::~PTable()
 
 //--------------------------------------------------------------------
 
-int PTable::ExecUpdate(char* filename)
-{
-	bmsem->P();			//chi nap 1 tien trinh vao mot thoi diem
+int PTable::ExecUpdate(char* filename) {
+	//chi nap 1 tien trinh vao mot thoi diem
+	bmsem->P();			
 
-//Kiem tra file co ton tai tren may khong
+	//Kiem tra file co ton tai tren may khong
 	OpenFile *executable = fileSystem->Open(filename);
 	if (executable == NULL) 
 	{
 		printf("\nUnable to open file %s\n", filename);
 		bmsem->V();
 		return -1;
-    	}
+  }
 	delete executable;			// close file
-////////////////////////////////////////////////////////////
 
 //Kiem tra chuong trinh duoc goi co la chinh no khong
 	if(!strcmp(filename,currentThread->getName()))
@@ -49,7 +48,6 @@ int PTable::ExecUpdate(char* filename)
 		bmsem->V();
 		return -1;
 	}
-////////////////////////////////////////////////////////////
 
 //Kiem tra con slot trong khong
 	int ID= GetFreeSlot();
@@ -59,10 +57,12 @@ int PTable::ExecUpdate(char* filename)
 		bmsem->V();
 		return -1;
 	}
-////////////////////////////////////////////////////////////
 
+	// Create a new PCB object wiht processID is ID:
 	pcb[ID]= new PCB(ID);
 	bm->Mark(ID);
+
+	// Exec PCB object:
 	int pID= pcb[ID]->Exec(filename,ID);
 
 	bmsem->V();

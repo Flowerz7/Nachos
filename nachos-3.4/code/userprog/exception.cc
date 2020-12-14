@@ -55,7 +55,6 @@
 //        - Limit of buffer (int)
 // Output: - Buffer (char*)
 // Purpose: Copy buffer from user memory space to System memory space.
-
 char* User2System(int virtAddr, int limit) {
   int i;
   int oneChar;
@@ -86,7 +85,6 @@ char* User2System(int virtAddr, int limit) {
 //        - Buffer (char[])
 // Output: - Number of file copied (int)
 // Purpose: Copy buffer from system memory space to user memory space.
-
 int System2User(int virtAddr, int len, char* buffer) {
   if(len < 0) {
     return -1;
@@ -146,9 +144,50 @@ void ExceptionHandler(ExceptionType which)
           case SC_Exit: {
             break;
           }
+
+          // SpaceId Exec(char* name);
+          // Input: the given file name of process.
+          // Output: Return the id of process if exec suscess,
+          //         Otherwise, return -1.
           case SC_Exec: {
-            break;
+
+            // Reading file name from R4 to store it into kernal mode:
+            int virtAddr;
+            virtAddr = machine->ReadRegister(4);  
+            char* name;
+            name = User2System(virtAddr, MaxFileLength + 1); 
+  
+            // Not enough memory in Kernal mode case:
+            if(name == NULL) {
+              DEBUG('a', "\n Not enough memory in System");
+              printf("\n Not enough memory in System");
+
+              machine->WriteRegister(2, -1);
+              //IncreasePC();
+              return;
+            }
+
+            // Opening given file name:
+            OpenFile *oFile = fileSystem->Open(name);
+            if (oFile == NULL) {
+              printf("\nExec:: Can't open this file.");
+
+              machine->WriteRegister(2,-1);
+              IncreasePC();
+              return;
+            }
+
+            delete oFile;
+
+            // Return child process id:
+            int id = processTab->ExecUpdate(name); 
+
+            machine->WriteRegister(2,id);
+            delete[] name;  
+            IncreasePC();
+            return;  
           }
+
           case SC_Join: {
             break;
           }
