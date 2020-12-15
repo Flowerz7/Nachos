@@ -4,144 +4,116 @@
 #include "thread.h"
 #include "addrspace.h"
 
+// Extern MyStartProcess() method from progtess.cc
+extern void MyStartProcess(int id);
 
+// Contructor:
 PCB::PCB(int id)
 {
-	joinsem= new Semaphore("JoinSem",0);
-	exitsem= new Semaphore("ExitSem",0);
-	mutex= new Semaphore("Mutex",1);
-	pid= id;
-	exitcode= 0;
-	numwait= 0;
-	if(id)
-		parentID= currentThread->processID;
-	else
-		parentID= 0;
-	thread= NULL;
-	JoinStatus= -1;
+	// Set parentID:
+  if (id == 0)
+      this->parentID = -1;
+  else
+      this->parentID = currentThread->processID;
 
+	// Set numwait, exitcode, boolBG and thread pointer:
+	this->numwait = this->exitcode = this->boolBG = 0;
+	this->thread = NULL;
+
+	// Create joinsem, exitsem and multex semaphore object:
+	this->joinsem = new Semaphore("joinsem",0);
+	this->exitsem = new Semaphore("exitsem",0);
+	this->multex = new Semaphore("multex",1);
 }
 
+// Destructor:
 PCB::~PCB()
 {
+	
 	if(joinsem != NULL)
-		delete joinsem;
+		delete this->joinsem;
 	if(exitsem != NULL)
-		delete exitsem;
-	if(mutex != NULL)
-		delete mutex;
+		delete this->exitsem;
+	if(multex != NULL)
+		delete this->multex;
+	if(thread != NULL)
+	{		
+		thread->FreeSpace();
+		thread->Finish();
+	}
 }
 
-//------------------------------------------------------------------
-int PCB::GetID()
+
+int PCB::GetID(){ return this->thread->processID; }
+int PCB::GetNumWait() { return this->numwait; }
+int PCB::GetExitCode() { return this->exitcode; }
+void PCB::SetExitCode(int ec){ this->exitcode = ec; }
+
+void PCB::JoinWait()
 {
-	return pid;
+	// Descrese semaphore count of joinsem:
+  joinsem->P();
 }
 
-int PCB::GetNumWait()
-{
-	return numwait;
+void PCB::JoinRelease()
+{ 
+	// Increase semaphore count of joinsem:
+  joinsem->V();
 }
 
-int PCB::GetExitCode()
-{
-	return exitcode;	
+void PCB::ExitWait()
+{ 
+	// Descrease semaphore count of exitsem:
+  exitsem->P();
 }
 
-void PCB::SetExitCode(int ec)
+void PCB::ExitRelease() 
 {
-	exitcode= ec;
+	// Increase semaphore count of exitsem:
+  exitsem->V();
 }
 
 void PCB::IncNumWait()
 {
-	mutex->P();
-	numwait++;
-	mutex->V();
+	multex->P();
+	++numwait;
+	multex->V();
 }
 
 void PCB::DecNumWait()
 {
-	mutex->P();
-	if(numwait)
-		numwait--;
-	mutex->V();
+	multex->P();
+	if(numwait > 0)
+		--numwait;
+	multex->V();
 }
 
-char* PCB::GetNameThread()
-{
-	return thread->getName();
-}
+void PCB::SetFileName(char* fn){ strcpy(FileName,fn);}
+char* PCB::GetFileName() { return this->FileName; }
 
-//-------------------------------------------------------------------
-void PCB::JoinWait()
-{
-	JoinStatus= parentID;
-	IncNumWait();
-	joinsem->P();
-}
 
-void PCB::JoinRelease()
-{
-	DecNumWait();
-	joinsem->V();
-}
+// Execute the thread:
+int PCB::Exec(char* filename, int id)
+{  
+	// Using multual exclusive semaphore to make sure only one thread is forked at
+	// a time:
+	multex->P();
 
-void PCB::ExitWait()
-{
-	exitsem->P();
-}
-
-void PCB::ExitRelease()
-{
-	exitsem->V();
-}
-
-//------------------------------------------------------------------
-int PCB::Exec(char *filename, int pID)
-{
-	mutex->P();
-
-	// Create a new Thread:
-	thread= new Thread(filename);
-	if(thread == NULL)
-	{
-		printf("\nLoi: Khong tao duoc tien trinh moi !!!\n");
-		mutex->V();
+	// Create thread that run the program in given filaname:
+	this->thread = new Thread(filename);
+	if(this->thread == NULL){
+		printf("\nPCB::Exec:: Not enough memory..!\n");
+    multex->V();
 		return -1;
 	}
 
-	// Set processID of this thread:
-	this->thread->processID= pID;
-
-	// Set parentID is processID of the thread that call Exec():
+	this->thread->processID = id;
+	// parentID of this thread is the thread which call Exec:
 	this->parentID = currentThread->processID;
 
-	// Running Fork method of this thread:
-	this->thread->Fork(MyStartProcess,pID);
+	// Fork this thread with given MyStartProcess in progtest.cc.
+ 	this->thread->Fork(MyStartProcess,id);
 
-	mutex->V();
-	return pID;
-}
-
-
-//*************************************************************************************
-void MyStartProcess(int pID)
-{
-	char *filename= processTab->GetName(pID);
-	AddrSpace *space= new AddrSpace(filename);
-	if(space == NULL)
-	{
-		printf("\nLoi: Khong du bo nho de cap phat cho tien trinh !!!\n");
-		return; 
-	}
-	currentThread->space= space;
-
-	space->InitRegisters();		// set the initial register values
-	space->RestoreState();		// load page table register
-
-	machine->Run();			// jump to the user progam
-	ASSERT(FALSE);			// machine->Run never returns;
-						// the address space exits
-						// by doing the syscall "exit"
+  multex->V();
+	return id;
 }

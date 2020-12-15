@@ -19,6 +19,30 @@
 // 	Run a user program.  Open the executable, load it into
 //	memory, and jump to it.
 //----------------------------------------------------------------------
+
+void MyStartProcess(int id)
+{
+    // Get file name from the given IDprocess:
+    char* fileName = processTab->GetFileName(id);
+
+    // Loading the program at filename into memory:
+    AddrSpace *space;
+    space = new AddrSpace(fileName);
+    if(space == NULL)
+    {
+        printf("\nPCB::Exec : Can't create AddSpace.");
+        return;
+    }
+
+    // Starting this process after loading program into memory success:
+    currentThread->space = space;
+    space->InitRegisters();   
+    space->RestoreState();    
+    machine->Run();   
+    ASSERT(FALSE);    
+}
+
+
 void
 StartProcess(char *filename)
 {

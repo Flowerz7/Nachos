@@ -149,26 +149,28 @@ void ExceptionHandler(ExceptionType which)
           // Input: the given file name of process.
           // Output: Return the id of process if exec suscess,
           //         Otherwise, return -1.
+          // Purpose: Execute the userprogram at given path file.
           case SC_Exec: {
-
             // Reading file name from R4 to store it into kernal mode:
             int virtAddr;
             virtAddr = machine->ReadRegister(4);  
-            char* name;
-            name = User2System(virtAddr, MaxFileLength + 1); 
+            char* pathOfFile;
+            pathOfFile = User2System(virtAddr, MaxFileLength + 1); 
   
-            // Not enough memory in Kernal mode case:
-            if(name == NULL) {
+
+            // Not enough memory in Kernal mode case -> Return Debug message and
+            // end this syscall:
+            if(pathOfFile == NULL) {
               DEBUG('a', "\n Not enough memory in System");
               printf("\n Not enough memory in System");
 
               machine->WriteRegister(2, -1);
-              //IncreasePC();
+              IncreasePC();
               return;
             }
 
             // Opening given file name:
-            OpenFile *oFile = fileSystem->Open(name);
+            OpenFile *oFile = fileSystem->Open(pathOfFile);
             if (oFile == NULL) {
               printf("\nExec:: Can't open this file.");
 
@@ -176,14 +178,15 @@ void ExceptionHandler(ExceptionType which)
               IncreasePC();
               return;
             }
-
             delete oFile;
 
-            // Return child process id:
-            int id = processTab->ExecUpdate(name); 
+            // Running ExecUpdate() method in PTable class:
+            int id = processTab->ExecUpdate(pathOfFile); 
 
+            // Return the child process id:
             machine->WriteRegister(2,id);
-            delete[] name;  
+
+            delete[] pathOfFile;  
             IncreasePC();
             return;  
           }

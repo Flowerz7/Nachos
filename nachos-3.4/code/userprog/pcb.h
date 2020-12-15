@@ -4,38 +4,76 @@
 #include "thread.h"
 #include "synch.h"
 
+// Process Control Block Class
 class PCB
 {
 private:
-	Semaphore	*joinsem;	//semaphore cho qua trinh join
-	Semaphore	*exitsem;	//semaphore cho qua trinh exit
-	Semaphore	*mutex;
-	int		exitcode;
-	Thread		*thread;
-	int		pid;
-	int		numwait;	//so tien trinh da join
+    // JoinProcess's semaphore.
+    Semaphore* joinsem;         
 
+    // ExitProcess's semaphore. 
+    Semaphore* exitsem;         
+
+    // Multual Exclusive semaphore.
+    Semaphore* multex;          
+
+    // Exitcode.
+    int exitcode;		
+
+    // Number of process which joined.
+    int numwait;                
+
+    // Name of process.
+    char FileName[32];          
+
+    // The thread in this PCB. 
+    Thread* thread;             
 public:
-	int 		parentID;	//ID cua tien trinh cha
-	int		JoinStatus;	//Trang thai co Join voi tien trinh nao khong? neu co thi gia tri chinh la ID cua tien trinh ma no Join
+    // ID of parent process.
+    int parentID;          
+    
+    char boolBG;                
+    
+    // Constructor:
+    PCB(int = 0);               
 
-	PCB(int id);
-	~PCB();
-	int Exec(char *filename, int pID); //nap chuong trinh co ten luu trong bien filename va processID se la pID
-	int GetID();
-	int GetNumWait();
-	void JoinWait();
-	void ExitWait();
-	void JoinRelease();
-	void ExitRelease();
-	void IncNumWait();
-	void DecNumWait();
-	void SetExitCode(int ec);
-	int GetExitCode();
-	char* GetNameThread();
+    // Desctrutor:
+    ~PCB();                     
+
+    // Create a new thread:
+    int Exec(char*,int);      
+
+    // Return ProcessID:
+    int GetID();             
+
+    // Return NumWait:
+    int GetNumWait();       
+
+    void JoinWait();            
+                        
+    void ExitWait();             
+
+    void JoinRelease();         
+
+    void ExitRelease();        
+
+    // Increasing NumWait:
+    void IncNumWait();     
+
+    // Descreasing NumWait:
+    void DecNumWait();      
+
+    // Set ExitCode:
+    void SetExitCode(int);   
+
+    // Get ExitCode:
+    int GetExitCode();        
+
+    // Set name of process:
+    void SetFileName(char*);   
+
+    // Get name of process:
+    char* GetFileName();        
 };
 
-//*********************************************************************************************************************
-void MyStartProcess(int pID);
-
-#endif
+#endif // PCB_H
