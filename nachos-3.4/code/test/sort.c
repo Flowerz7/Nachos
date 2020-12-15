@@ -53,7 +53,7 @@ main()
         }
     }
     else if (asc == 0) {
-	PrintChar('\n');
+	  PrintChar('\n');
         for (i = 0; i < n - 1; i++)
         {
             for (j = 0; j < (n - 1 - i); j++)
@@ -77,5 +77,5 @@ main()
         PrintInt(A[i]);
         PrintChar(' ');
     }
-    Exit(A[0]);		/* and then we're done -- should be 0! */
+    Halt();
 }

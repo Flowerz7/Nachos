@@ -31,8 +31,7 @@ private:
 public:
     // ID of parent process.
     int parentID;          
-    
-    char boolBG;                
+    int JoinStatus;
     
     // Constructor:
     PCB(int = 0);               

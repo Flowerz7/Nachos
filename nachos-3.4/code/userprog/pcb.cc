@@ -17,7 +17,8 @@ PCB::PCB(int id)
       this->parentID = currentThread->processID;
 
 	// Set numwait, exitcode, boolBG and thread pointer:
-	this->numwait = this->exitcode = this->boolBG = 0;
+	this->numwait = this->exitcode = 0;
+	this->JoinStatus = -1;
 	this->thread = NULL;
 
 	// Create joinsem, exitsem and multex semaphore object:
