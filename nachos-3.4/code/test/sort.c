@@ -77,5 +77,7 @@ main()
         PrintInt(A[i]);
         PrintChar(' ');
     }
-    Exit(A[0]);		/* and then we're done -- should be 0! */
+    //Exit(A[0]);		/* and then we're done -- should be 0! */
+
+    Halt();
 }
