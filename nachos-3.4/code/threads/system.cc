@@ -191,6 +191,9 @@ Cleanup()
     delete machine;
 		delete gSynchConsole;
 
+		delete addrLock;
+		delete gPhysPageBitMap;
+		delete processTab;
 #endif
 
 #ifdef FILESYS_NEEDED
