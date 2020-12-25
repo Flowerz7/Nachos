@@ -54,7 +54,7 @@ int PTable::ExecUpdate(char* name)
 		printf("\nUnable to open file %s\n", name);
 		bmsem->V();
 		return -1;
-  }
+  	}
 	delete executable;			
 
 	// Make sure the parent process do not call itsefl.
@@ -79,7 +79,7 @@ int PTable::ExecUpdate(char* name)
 	pcb[index]->SetFileName(name);
 
 	// ParentID of new PCB is the thread run this Exec function:
-  pcb[index]->parentID = currentThread->processID;
+	pcb[index]->parentID = currentThread->processID;
 
 	// Run Exec method of new PCB:
 	int pid = pcb[index]->Exec(name,index);
