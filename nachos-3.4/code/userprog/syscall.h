@@ -37,6 +37,7 @@
 #define SC_PrintChar	14
 #define SC_ReadInt 15
 #define SC_PrintInt 16
+
 #define SC_Sort 17
 #define SC_Ascii 18
 #define SC_Help 19
