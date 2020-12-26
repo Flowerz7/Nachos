@@ -159,6 +159,8 @@ char ReadChar();
 void PrintChar(char character);
 int ReadInt();
 void PrintInt(int number);
+
+
 void Sort();
 void Ascii();
 void Help();
